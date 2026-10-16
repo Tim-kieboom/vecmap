@@ -3,7 +3,7 @@
 /// Each generated ID type is backed by a `usize` and can be used
 /// as an index into `VecMap`.
 #[macro_export]
-macro_rules! impl_sol_ids {
+macro_rules! impl_ids {
     ( $( $( #[$meta:meta] )* $ty:ident ),* $(,)? ) => {
         $(
             $( #[$meta] )*
@@ -18,9 +18,11 @@ macro_rules! impl_sol_ids {
             impl $ty {
                 #[allow(unused)]
                 pub const ERROR: $ty = $ty(0);
+                #[allow(unused)]
+                pub const BEGIN: $ty = $ty(1);
             }
 
-            impl $crate::collections::vec_map::VecMapIndex for $ty {
+            impl $crate::vec_map::VecMapIndex for $ty {
                 fn new_index(value: usize) -> Self {
                     Self(value)
                 }
@@ -33,11 +35,11 @@ macro_rules! impl_sol_ids {
             impl $crate::ids::IdAlloc for $ty {
 
                 fn error() -> Self {
-                    Self(0)
+                    Self::ERROR
                 }
 
                 fn begin() -> Self {
-                    Self(1)
+                    Self::BEGIN
                 }
 
                 fn alloc(&mut self) -> Self {
@@ -47,7 +49,11 @@ macro_rules! impl_sol_ids {
                 }
 
                 fn last(&self) -> Self {
-                    self.clone()
+                    if *self == Self::BEGIN { 
+                        return Self::BEGIN 
+                    }
+                    
+                    Self(self.0.saturating_sub(1))
                 }
             }
         )*
