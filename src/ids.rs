@@ -100,6 +100,11 @@ impl<Id: IdAlloc> IdGenerator<Id> {
         self.current.last()
     }
 }
+impl<Id: IdAlloc> From<Id> for IdGenerator<Id> {
+    fn from(value: Id) -> Self {
+        Self { current: value }
+    }
+}
 impl<Id: IdAlloc> Default for IdGenerator<Id> {
     fn default() -> Self {
         Self {
