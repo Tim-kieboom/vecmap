@@ -1,5 +1,5 @@
 use crate::ids::*;
-use crate::vec_map::VecMapIndex;
+use crate::vec_map_index::VecMapIndex;
 
 crate::impl_ids!(TestNodeId, TestBlockId);
 
@@ -36,10 +36,7 @@ fn alloc_does_not_reuse_ids() {
     assert_ne!(second, third);
     assert_ne!(first, third);
 
-    assert_eq!(
-        [first.index(), second.index(), third.index()],
-        [1, 2, 3]
-    );
+    assert_eq!([first.index(), second.index(), third.index()], [1, 2, 3]);
 }
 
 #[test]

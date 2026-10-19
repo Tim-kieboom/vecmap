@@ -1,4 +1,4 @@
-use crate::{vec_map::VecMapIndex, vec_set::VecSet};
+use crate::{vec_map_index::VecMapIndex, vec_set::VecSet};
 
 // Simple index type for testing
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

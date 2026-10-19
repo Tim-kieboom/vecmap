@@ -1,4 +1,7 @@
-use crate::vec_map::*;
+use crate::{
+    vec_map::{VecMap, entry::Entry},
+    vec_map_index::VecMapIndex,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 struct TestIndex(usize);

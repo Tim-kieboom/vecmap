@@ -22,7 +22,7 @@ macro_rules! impl_ids {
                 pub const BEGIN: $ty = $ty(1);
             }
 
-            impl $crate::vec_map::VecMapIndex for $ty {
+            impl $crate::vec_map_index::VecMapIndex for $ty {
                 fn new_index(value: usize) -> Self {
                     Self(value)
                 }
@@ -49,10 +49,10 @@ macro_rules! impl_ids {
                 }
 
                 fn last(&self) -> Self {
-                    if *self == Self::BEGIN { 
-                        return Self::BEGIN 
+                    if *self == Self::BEGIN {
+                        return Self::BEGIN
                     }
-                    
+
                     Self(self.0.saturating_sub(1))
                 }
             }

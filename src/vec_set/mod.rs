@@ -1,14 +1,17 @@
 use std::ops::Index;
 
-use serde::ser::SerializeTuple;
+use crate::{
+    vec_map::{VecMap, iter::VecMapKeysIter},
+    vec_map_index::VecMapIndex,
+};
 
-use crate::vec_map::{VecMap, VecMapIndex};
+pub mod serde;
 
 /// A set-like data structure backed by a [`VecMap`].
 ///
 /// Each unique index `I` maps to a presence marker `()`.
 /// This provides O(1) lookup and set operations using ID types.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct VecSet<I: VecMapIndex> {
     map: VecMap<I, ()>,
 }
@@ -81,7 +84,12 @@ impl<I: VecMapIndex> VecSet<I> {
     }
 
     /// Returns an iterator over all indices in the set.
-    pub fn entries(&self) -> impl Iterator<Item = I> {
+    pub fn entries(&self) -> VecMapKeysIter<'_, I, ()> {
+        self.iter()
+    }
+
+    /// Returns an iterator over all indices in the set.
+    pub fn iter(&self) -> VecMapKeysIter<'_, I, ()> {
         self.map.keys()
     }
 
@@ -97,10 +105,19 @@ impl<I: VecMapIndex> VecSet<I> {
 
     /// Returns an iterator over indices present in both `self` and `other`.
     pub fn intersection<'a>(&'a self, other: &'a Self) -> impl Iterator<Item = I> + 'a {
-        self.entries()
+        self.iter()
             .filter(move |index| other.contains(I::new_index(index.index())))
     }
 }
+impl<'a, I: VecMapIndex> IntoIterator for &'a VecSet<I> {
+    type Item = I;
+    type IntoIter = VecMapKeysIter<'a, I, ()>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.entries()
+    }
+}
+
 impl<I: VecMapIndex> Index<I> for VecSet<I> {
     type Output = bool;
 
@@ -110,49 +127,6 @@ impl<I: VecMapIndex> Index<I> for VecSet<I> {
         } else {
             &false
         }
-    }
-}
-impl<I: VecMapIndex> FromIterator<I> for VecSet<I> {
-    fn from_iter<Iter: IntoIterator<Item = I>>(iter: Iter) -> Self {
-        let mut set = Self::new();
-        for i in iter {
-            set.insert(i);
-        }
-        set
-    }
-}
-impl<I: VecMapIndex> Default for VecSet<I> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<I> serde::Serialize for VecSet<I>
-where
-    I: serde::Serialize + VecMapIndex,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut map = serializer.serialize_tuple(self.len())?;
-        for index in self.entries() {
-            map.serialize_element(&index)?;
-        }
-        map.end()
-    }
-}
-
-impl<'de, I> serde::Deserialize<'de> for VecSet<I>
-where
-    I: serde::Deserialize<'de> + VecMapIndex,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let list = Vec::<I>::deserialize(deserializer)?;
-        Ok(VecSet::from_vec(list))
     }
 }
 impl<I: VecMapIndex, const N: usize> From<[I; N]> for VecSet<I> {
