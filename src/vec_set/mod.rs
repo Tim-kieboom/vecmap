@@ -19,7 +19,7 @@ impl<I: VecMapIndex> VecSet<I> {
     /// Creates a new empty [`VecSet`].
     pub const fn new() -> Self {
         Self {
-            map: VecMap::default(),
+            map: VecMap::const_default(),
         }
     }
 
