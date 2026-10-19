@@ -18,7 +18,9 @@ pub struct VecSet<I: VecMapIndex> {
 impl<I: VecMapIndex> VecSet<I> {
     /// Creates a new empty [`VecSet`].
     pub const fn new() -> Self {
-        Self { map: VecMap::new() }
+        Self {
+            map: VecMap::default(),
+        }
     }
 
     /// Creates a new [`VecSet`] with the given capacity.

@@ -176,7 +176,7 @@ impl<I: VecMapIndex, T> VecMap<I, T> {
     }
 }
 
-impl<I: VecMapIndex, T: Default> Default for VecMap<I, T> {
+impl<I: VecMapIndex, T> Default for VecMap<I, T> {
     fn default() -> Self {
         Self::const_default()
     }
